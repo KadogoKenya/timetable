@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Styles -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,400i,600,700,700i&subset=latin-ext" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/tables.css' %}" rel="stylesheet">
+    <link href="{% static 'css/add.css' %}" rel="stylesheet">
+    <link href="{% static 'css/nav.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" src="extensions/sticky-header/bootstrap-table-sticky-header.css">
+    <script src="extensions/sticky-header/bootstrap-table-sticky-header.js"></script>
+
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-image: url('https://example.com/background.jpg'); /* Replace with your background image URL */
+            background-size: cover;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-position: center center;
+            color: #fff;
+        }
+
+        .navbar {
+            background: #004d99; /* Replace with the exact color from your logo */
+        }
+
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+
+
+        .btn-circle.btn-xl {
+            width: 70px;
+            height: 70px;
+            padding: 10px 16px;
+            border-radius: 35px;
+            font-size: 24px;
+            line-height: 1.33;
+        }
+
+        .btn-circle {
+            width: 30px;
+            height: 30px;
+            padding: 6px 0px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.42857;
+        }
+
+        .jumbotron {
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding: 2rem;
+        }
+
+        .jumbotron h1 {
+            text-align: center;
+            font-weight: 700;
+        }
+        .image-item {
+            position: absolute;
+            transform: translate(var(--x), var(--y));
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border: none;
+        }
+
+        .card-body {
+            text-align: center;
+        }
+
+        .alert {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+        }
+
+        .options .container {
+            padding: 7rem 5;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">Timetable Management</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">HOME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/adminsignup_view">ADMIN</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">LECTURERS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">STUDENTS</a>
+                </li>
+              
+            </ul>
+        </div>
+    </nav>
+
+    <br>
+    <br>
+
+    <center><h3 style="margin-bottom: 0px;" class='alert alert-success'>Welcome to Online Timetable Management!</h3></center>
+    <!-- <div class="jumbotron" style="margin-bottom: 0px;"> -->
+      <div class="image-item" style="--x: 500px; --y: -80px;">
+        <img src="{% static 'media/logo 2020 clear-01 (3).png' %}" alt="Image 6" height="500" width="400">
+        <!-- <button class="more-button center white" data-modal="modal6">more</button> -->
+    </div>
+        <!-- <img src= alt="Welcome Image" class="image-item" height="400px" width="600px">  -->
+
+        <div class="options" style="text-align:center">
+            <div class="container">
+                <div class="card-columns">
+                    <div class="card">
+                        <div class="card-body" height="200px">
+                            <a href="/adminsignup_view" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Admin Login</a><br><br>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body" height="200px">
+                            <a href="lecturerclick" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Lecturer Login</a><br><br>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body" height="200px">
+                            <a href="studentclick" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Student Login</a><br><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
