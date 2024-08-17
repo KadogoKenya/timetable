@@ -2,6 +2,30 @@ from django.db import models
 from multiselectfield import MultiSelectField
 from django.contrib.auth.hashers import make_password
 
+TIME_CHOICES = (
+    ('08:00 AM', '08:00 AM'),
+    ('09:00 AM', '09:00 AM'),
+    ('10:00 AM', '10:00 AM'),
+    ('11:00 AM', '11:00 AM'),
+    ('12:00 PM', '12:00 PM'),
+    ('01:00 PM', '01:00 PM'),
+    ('02:00 PM', '02:00 PM'),
+    ('03:00 PM', '03:00 PM'),
+    ('04:00 PM', '04:00 PM'),
+    ('05:00 PM', '05:00 PM'),
+    ('06:00 PM', '06:00 PM'),
+    ('07:00 PM', '07:00 PM'),
+    ('08:00 PM', '08:00 PM'),
+)
+
+WEEK_DAY = (
+    ('Monday', 'Monday'),
+    ('Tuesday', 'Tuesday'),
+    ('Wednesday', 'Wednesday'),
+    ('Thursday', 'Thursday'),
+    ('Friday', 'Friday'),
+    ('Saturday', 'Saturday')
+)
 
 class Course(models.Model):
     COURSE_TYPE = (
@@ -17,7 +41,6 @@ class Course(models.Model):
 
     def __str__(self):
         return self.course_id + ' - ' + self.course_name
-
 
 
 class Lecturer(models.Model):
@@ -50,34 +73,9 @@ class Classroom(models.Model):
         return self.classroom_name #+ ' - ' + self.classroom_name
 
 
-
 class Class(models.Model):
-    WEEK_DAY = [
-    ('Monday', 'Monday'),
-    ('Tuesday', 'Tuesday'),
-    ('Wednesday', 'Wednesday'),
-    ('Thursday', 'Thursday'),
-    ('Friday', 'Friday'),
-    ('Saturday', 'Saturday'),
-    
-    ]
-
-    TIME_CHOICES = (
-        ('8:00 AM', '8:00 AM'),
-        ('9:00 AM', '9:00 AM'),
-        ('10:00 AM', '10:00 AM'),
-        ('11:00 AM', '11:00 AM'),
-        ('12:00 PM', '12:00 PM'),
-        ('13:00 PM', '13:00 PM'),
-        ('14:00 PM', '14:00 PM'),
-        ('15:00 PM', '15:00 PM'),
-        ('16:00 PM', '16:00 PM'),
-        ('17:00 PM', '17:00 PM'),
-        ('18:00 PM', '18:00 PM')
-
-    )
-
-    
+    WEEK_DAY = WEEK_DAY
+    TIME_CHOICES = TIME_CHOICES
 
     class_id = models.IntegerField(primary_key=True)
     class_name = models.CharField(max_length=2000, null=True)
@@ -101,14 +99,12 @@ class ClassCourse(models.Model):
         return f"{self.class_id}"
 
 
-
 class RequestChange(models.Model):
     lecturer=models.ForeignKey(Lecturer,on_delete=models.CASCADE)
     messange=models.CharField(max_length=300)
 
     def __str__(self):
         return f"{self.lecturer}, {self.messange}"
-
 
 
 class Student(models.Model):
@@ -131,7 +127,6 @@ class SectionClassroom(models.Model):
     class_id = models.ForeignKey(Class,on_delete=models.CASCADE)
     classroom_id = models.ForeignKey(Classroom,on_delete=models.CASCADE)
     
-    
     def __str__(self):
         return f'{self.class_id},{self.classroom_id}' 
 
@@ -141,32 +136,8 @@ class Activity(models.Model):
         ('Fixed', 'Fixed'),
         ('Replaceable', 'Replaceable')
     )
-    WEEK_DAY = (
-    ('Monday', 'Monday'),
-    ('Tuesday', 'Tuesday'),
-    ('Wednesday', 'Wednesday'),
-    ('Thursday', 'Thursday'),
-    ('Friday', 'Friday'),
-    ('Saturday', 'Saturday'),
-    ('Sunday', 'Sunday')
-    )
-
-    TIME_CHOICES = (
-        ('8:00 AM', '8:00 AM'),
-        ('9:00 AM', '9:00 AM'),
-        ('10:00 AM', '10:00 AM'),
-        ('11:00 AM', '11:00 AM'),
-        ('12:00 PM', '12:00 PM'),
-        ('13:00 PM', '13:00 PM'),
-        ('14:00 PM', '14:00 PM'),
-        ('15:00 PM', '15:00 PM'),
-        ('16:00 PM', '16:00 PM'),
-        ('17:00 PM', '17:00 PM'),
-        ('18:00 PM', '18:00 PM')
-
-    )
-
-    
+    WEEK_DAY = WEEK_DAY
+    TIME_CHOICES = TIME_CHOICES
   
     activity_id = models.CharField(max_length=2000, primary_key=True)
     activity_type = models.CharField(max_length=2000, null=True, choices=ACTIVITY_TYPE)
@@ -179,10 +150,4 @@ class Activity(models.Model):
     end_time = models.CharField(max_length=10, choices=TIME_CHOICES)
 
     def __str__(self):
-        return self.activity_id
-    
-    def __str__(self):
         return f"{self.lecturer_id}, {self.class_id},{self.classroom_id}"
-
-
-    

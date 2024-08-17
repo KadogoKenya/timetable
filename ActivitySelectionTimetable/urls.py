@@ -9,9 +9,9 @@ from django.contrib.auth.views import LoginView,LogoutView
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
 
-    re_path('admin/', admin.site.urls, name='admin'),
+    path('admin/', admin.site.urls, name='admin'),
     re_path('accounts/',include('django.contrib.auth.urls') ),
     
     

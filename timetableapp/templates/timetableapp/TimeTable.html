@@ -30,12 +30,14 @@
 
         .timetable {
             display: grid;
-            grid-template-areas: ". week" "time content";
+            grid-template-areas: ". week" 
+                                 "time content";
             grid-template-columns: 120px;
             grid-template-rows: 60px;
             width: 100vw;
             height: 100vh;
-            --num_columns:6;
+            --num-columns: 6;
+            --num-rows: 7;
         }
 
         .timetable .accent-pink-gradient {
@@ -106,7 +108,7 @@
         .timetable .week-names {
             grid-area: week;
             display: grid;
-            grid-template-columns: repeat(var(--num_columns), 1fr);
+            grid-template-columns: repeat(var(--num-columns), 1fr);
             text-transform: uppercase;
             font-size: 12px;
         }
@@ -126,7 +128,7 @@
         .timetable .time-interval {
             grid-area: time;
             display: grid;
-            grid-template-rows: repeat(7, 1fr);
+            grid-template-rows: repeat(var(--num-rows), 1fr);
             font-size: 14px;
         }
 
@@ -145,8 +147,8 @@
         .timetable .content {
             grid-area: content;
             display: grid;
-            grid-template-rows: repeat(7, 1fr);
-            grid-template-columns: repeat(var(--num_columns), 1fr);
+            grid-template-rows: repeat(var(--num-rows), 1fr);
+            grid-template-columns: repeat(var(--num-columns), 1fr);
         }
 
         .timetable .content > div {
@@ -167,24 +169,28 @@
             {% endfor %}
         </div>
         <div class="content">
-            {{ section.class_name }}
-            {% for x in time %}
-                {% for day, _ in section.WEEK_DAY %}
+            <!-- {{ section.class_name }} -->
+            {% for day, _ in section.WEEK_DAY %}
+                {% for x in time_choices %}
                     <div>
+                        {{day}}, {{x}}
+                    </div>
+                    <!-- <div>
                         {% for activity in activities %}
-                        <!-- {{ activity }} -->
                             {% for course in courses %}
-                                {% if activity.course_id == course.course_id %}
+                                {% if activity.course_id.course_id == course.course_id %}
                                     {% if activity.day == day %}
-                                        {% if x == activity.start_time %}
+                                        'here'
+                                        <span style="color: red;">{{ x|date:"h:i A" }}</span>
+                                        <span style="color: green;">{{ activity.start_time }}</span>
+                                        {% if x|date:"h:i A" == activity.start_time %}
+                                            'ghfj'
                                             <p style="text-align:center; margin:0 !important; padding:0 !important">{{ course.course_name }} -
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
-                        {% endfor %}
-                        
-                        {% for activity in activities %}
+                            
                             {% for lecturer in lecturers %}
                                 {% if activity.lecturer_id == lecturer.lecturer_id %}
                                     {% if activity.day == day %}
@@ -194,9 +200,9 @@
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
-                        {% endfor %}
-                        <br>
-                        {% for activity in activities %}
+                            
+                            <br>
+                            
                             {% if activity.day == day %}
                                 {% if x == activity.start_time %}
                                     {{ activity.classroom_id }}
@@ -204,7 +210,7 @@
                             {% endif %}
                         {% endfor %}
                         </p>
-                    </div>
+                    </div> -->
                 {% endfor %}
             {% endfor %}
         </div>
