@@ -1,5 +1,6 @@
 from django.db import models
 from multiselectfield import MultiSelectField
+from django.contrib.auth.hashers import make_password
 
 
 class Course(models.Model):
@@ -21,15 +22,21 @@ class Course(models.Model):
 
 class Lecturer(models.Model):
     lecturer_id = models.CharField(max_length=2000,primary_key=True)
-    lecturer_name = models.CharField(max_length=2000, null=True)
-    working_hours = models.IntegerField(null=True)
-    available_hours = models.IntegerField(null=True)
+    first_name=models.CharField(max_length=2000, null=False)
+    last_name=models.CharField(max_length=2000,null=False)
+    email=models.EmailField(max_length=20,unique=True)
+    password=models.CharField(max_length=128)
+    working_hours = models.IntegerField(null=False)
+    available_hours = models.IntegerField(null=False)
 
     def __str__(self):
-        return self.lecturer_name
+        return self.first_name
 
-
-
+    def save(self, *args, **kwargs):
+        # Hash the password before saving
+        if not self.password.startswith('pbkdf2_sha256$'):  # Example check for Django's default hash
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 
 class Classroom(models.Model):
     CLASSRoom_TYPE = (
@@ -52,7 +59,7 @@ class Class(models.Model):
     ('Thursday', 'Thursday'),
     ('Friday', 'Friday'),
     ('Saturday', 'Saturday'),
-    ('Sunday', 'Sunday')
+    
     ]
 
     TIME_CHOICES = (
@@ -70,25 +77,16 @@ class Class(models.Model):
 
     )
 
-    LOCATION_CHOICES = [
-        ('Lab 1', 'Lab 1'),
-        ('Lab 2', 'Lab 2'),
-        ('Lab 3', 'Lab 3'),
-        ('Lab 4', 'Lab 4'),
-        ('Lab 5', 'Lab 5'),
-        ('Lab 6', 'Lab 6'),
-        ('Lab 7', 'Lab 7'),
-    ]
+    
 
     class_id = models.IntegerField(primary_key=True)
     class_name = models.CharField(max_length=2000, null=True)
-    location = models.CharField(max_length=10, choices=LOCATION_CHOICES)
     week_day = MultiSelectField(max_length=2000, choices=WEEK_DAY, max_choices=7)
     start_time = models.CharField(max_length=10, choices=TIME_CHOICES)
     end_time = models.CharField(max_length=10, choices=TIME_CHOICES)
 
     def __str__(self):
-        return f"{self.class_name}, {self.location}" #+ ' - ' + self.class_name
+        return f"{self.class_name}, {self.week_day}" #+ ' - ' + self.class_name
 
 
 # table to store courses for class

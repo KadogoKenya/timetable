@@ -3,8 +3,8 @@
 {% block content %}
 
     <div class="deleteBox">
-    <h3 id="deleteText">Do You want to delete "{{ delete.professor_name }}"?</h3>
-        <form method="POST" action="{% url 'delete-professor' delete.professor_id %}">
+    <h3 id="deleteText">Do You want to delete "{{ delete.first_name }}"?</h3>
+        <form method="POST" action="{% url 'delete-professor' delete.lecturer_id %}">
 
     <input class="deleteButton" type="submit" value="Delete">
         {% csrf_token %}

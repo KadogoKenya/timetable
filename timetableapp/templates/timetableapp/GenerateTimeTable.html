@@ -43,13 +43,13 @@
 				<tr>
                 
 					
-                        <th scope="row" class="table-light text-center">{{ section.class_id }}</th>
+                        <th scope="row" class="table-light text-center">{{ SectionClassroom.class_id }}</th>
                     
-						<th scope="row" class="table-dark text-center"  >{{ section.class_name }}</th>
+						<th scope="row" class="table-dark text-center"  >{{ SectionClassroom.class_name }}</th>
                    
-                        <th scope="row" class="table-light text-center"> <a href="{% url 'generate-timetable' section.class_id %}" class="btn btn-sm btn-danger" >Generate Timetable</a></th>
+                        <th scope="row" class="table-light text-center"> <a href="{% url 'generate-timetable' SectionClassroom.class_id %}" class="btn btn-sm btn-danger" >Generate Timetable</a></th>
                 
-                        <th scope="row" class="table-dark text-center"> <a href="{% url 'generate-timetable' section.class_id %}" class="btn btn-sm btn-danger" >View Timetable</a></th>
+                        <th scope="row" class="table-dark text-center"> <a href="{% url 'generate-timetable' SectionClassroom.class_id %}" class="btn btn-sm btn-danger" >View Timetable</a></th>
 
                     </tr>
 				

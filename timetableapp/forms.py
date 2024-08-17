@@ -15,10 +15,10 @@ class StudentSignUpForm(forms.ModelForm):
         fields=['first_name','last_name','email','password']
 
 
-class LecturerSignUpForm(forms.ModelForm):
-    class Meta:
-        model=User
-        fields=['first_name','last_name','email','password']
+# class LecturerSignUpForm(forms.ModelForm):
+#     class Meta:
+#         model=User
+#         fields=['first_name','last_name','email','password']
 
 
 class CourseForm(forms.ModelForm):
@@ -32,7 +32,7 @@ class ProfessorForm(forms.ModelForm):
     
     class Meta:
         model = Lecturer
-        fields = ['lecturer_id', 'lecturer_name', 'working_hours']
+        fields = ['lecturer_id', 'first_name','last_name','email', 'working_hours','available_hours']
 
 
 class ClassroomForm(forms.ModelForm):

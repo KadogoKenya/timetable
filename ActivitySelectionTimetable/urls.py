@@ -43,6 +43,10 @@ urlpatterns = [
     re_path('studentclick', views.studentclick_view),    
     re_path('studentlogin', LoginView.as_view(template_name='timetable/studentlogin.html')),
 
+
+    re_path('lecturersignup', views.lecturersignup_view),
+    re_path('lecturerlogin', LoginView.as_view(template_name='timetableapp/lecturerlogin.html')),
+
     re_path('logout', LogoutView.as_view(template_name='timetable/course_list.html')),
 
     re_path('',include('timetableapp.urls')),

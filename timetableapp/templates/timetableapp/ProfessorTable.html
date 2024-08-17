@@ -17,11 +17,27 @@
         <div class="table  text-center">
             <div class="table-header">
                 <div class="header__item filter__link">
-                   Professor Name
+                    Lecturer ID
+ 
+                 </div>
+                <div class="header__item filter__link">
+                   First Name
 
                 </div>
                 <div class="header__item filter__link">
-                  Working Hours
+                    Last Name
+ 
+                 </div>
+                 <div class="header__item filter__link">
+                    Email
+ 
+                 </div>
+                <div class="header__item filter__link">
+                    Available Hours
+ 
+                 </div>
+                <div class="header__item filter__link">
+                    Working Hours
 
                 </div>
                 <div class="header__item filter__link">
@@ -31,24 +47,43 @@
                 <div class="header__item filter__link">
                     Delete
 
-                </div>
+                </div>   
+
             </div>
             <div class="tab-content">
-                {% for prof in professor1 %}
+                {% for lecturer in lecturer %}
                 <div class="table-row text-center">
                     <div class="table-data">
-                        {{ prof.professor_name }}
+                        {{ lecturer.lecturer_id }}
                     </div>
                     
                     <div class="table-data">
-                        {{ prof.working_hours}}
+                        {{ lecturer.first_name}}
                     </div>
+                    <div class="table-data">
+                        {{ lecturer.last_name}}
+                    </div>
+                    <div class="table-data">
+                        {{ lecturer.email}}
+                    </div>
+
+                    <div class="table-data">
+                        {{ lecturer.working_hours }}
+                    </div>
+                    
+                    <div class="table-data">
+                        {{ lecturer.available_hours }}
+                    </div>
+                   
    
                     <div class="table-data">
-                       <a href="{% url 'update-professor' prof.professor_id %}" class="btn btn-sm btn-info">Update</a>
+                       <a href="{% url 'update-professor' lecturer.lecturer_id %}" class="btn btn-sm btn-info">Update</a>
                     </div>
                     <div class="table-data">
-                       <a href="{% url 'delete-professor' prof.professor_id %}" class="btn btn-sm btn-danger" >Remove</a>
+                       <a href="{% url 'delete-professor' lecturer.lecturer_id %}" class="btn btn-sm btn-danger" >Remove</a>
+                       
+                       <p class="card-text"><strong> Delete : </strong>: <a href=" {% url 'delete-professor' lecturer.lecturer_id %} " data-toggle="tooltip" title="delete this item"><i class="far fa-trash-alt" style="color: tomato; align-items: center;"></i></a></p>
+                                
                     </div>
 
                 </div>

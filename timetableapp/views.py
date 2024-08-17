@@ -12,9 +12,10 @@ from django.contrib.auth.decorators import login_required,user_passes_test
 from datetime import datetime,timedelta,date
 from . import forms
 from . import models
-from .forms import ClassCourseForm,ActivityForm,CourseForm,ProfessorForm,LecturerSignUpForm,SectionClassroomForm,SectionClassroom,ClassForm,AdminSignUpForm,ClassroomForm
+from .forms import ClassCourseForm,ActivityForm,CourseForm,ProfessorForm,SectionClassroomForm,SectionClassroom,ClassForm,AdminSignUpForm,ClassroomForm
 from .models import Class,ClassCourse,Classroom,Lecturer,Activity,Course
-
+from django.shortcuts import get_object_or_404
+from datetime import datetime
 
 
 def home_view(request):
@@ -46,8 +47,8 @@ def adminclick_view(request):
     
 def lecturerclick_view(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect('afterlogin')
-    return render(request,'timetableapp/lecturerclick.html')
+        # return HttpResponseRedirect('afterlogin')
+        return render(request,'timetableapp/lecturersignup.html')
 
 
 def adminsignup_view(request):
@@ -66,30 +67,23 @@ def adminsignup_view(request):
     return render(request,'timetableapp/adminsignup.html',{'form':form})
 
 
-def is_admin(user):
-    return user.groups.filter(name='ADMIN').exists()
-
-def afterlogin_view(request):
-    if is_admin(request.user):
-        return render(request,'timetableapp/adminafterlogin.html')
-    else:
-        return render(request,'timetableapp/studentafterlogin.html')
-    
 
 def lecturersignup_view(request):
-    form=forms.LecturerSignUpForm()
-    if request.method=='POST':
-        form=forms.LecturerSignUpForm(request.POST)
+    form = forms.ProfessorForm()
+    if request.method == 'POST':
+        form = forms.ProfessorForm(request.POST)
         if form.is_valid():
-            user=form.save()
-            user.set_password(user.password)
-            user.save()
+            user = form.save()  # Don't save the form to the database yet
+            user.set_password(form.cleaned_data['password'])  # Set the password
+            user.save()  # Save the User instance
 
-            my_lecturer_group = Group.objects.get_or_create(name='LECTURER')
-            my_lecturer_group[0].user_set.add(user)
+            # Add the user to the 'LECTURER' group
+            my_lecturer_group, created = Group.objects.get_or_create(name='LECTURER')
+            my_lecturer_group.user_set.add(user)
 
-            return HttpResponseRedirect('adminlogin')
-    return render(request,'timetableapp/lecturersignup.html',{'form':form})
+            return HttpResponseRedirect('lecturerlogin')
+
+    return render(request, 'timetableapp/lecturersignup.html', {'form': form})
 
 def studentsignup_view(request):
     form1=forms.StudentSignUpForm()
@@ -114,6 +108,24 @@ def studentsignup_view(request):
 
 
 
+def is_admin(user):
+    return user.groups.filter(name='ADMIN').exists()
+
+def is_student(user):
+    return user.groups.filter(name='STUDENT').exists()
+
+def afterlogin_view(request):
+    if is_admin(request.user):
+        return render(request,'timetableapp/adminafterlogin.html')
+    elif is_student:
+        return render(request,'timetableapp/studentafterlogin.html')
+   
+    else:
+        return render(request, 'timetableapp/lecturerafterlogin.html')
+
+
+
+
 def loginPage(request):
     context = {}
     if request.user.is_authenticated:
@@ -135,26 +147,12 @@ def loginPage(request):
         return render(request, 'timetableapp/login.html', context)
 
 
-def Logout(request):
+def LogoutView(request):
     logout(request)
-    return redirect('login')
+    return redirect('index')
 
+    return render(request, 'timetableapp/register.html', context)
 
-# def registerPage(request):
-#     if request.user.is_authenticated:
-#         return redirect('selection')
-#     else:
-#         form = CreateUserForm()
-#         if request.method == 'POST':
-#             form = CreateUserForm(request.POST)
-#             if form.is_valid():
-#                 form.save()
-#                 user = form.cleaned_data.get('username')
-#                 messages.success(request,'Account created successfully for ' + user)
-#                 return redirect('login')
-
-#         context = {'form':form}
-#         return render(request, 'timetableapp/register.html', context)
 
 def adminPage(request):
     course = CourseForm()
@@ -172,8 +170,25 @@ def adminPage(request):
 
             }
 
-
     return render(request, 'timetableapp/adminPage.html', context)
+
+def lecturerPage(request):
+    course = CourseForm()
+    professor = ProfessorForm()
+    classroom = ClassroomForm()
+    section = ClassForm()
+    sectioncourse = ClassCourseForm()
+    sectionclassroom = SectionClassroomForm()
+    activity = ActivityForm()
+    context = {
+
+                'course': course,'professor': professor,
+                'classroom': classroom, 'section': section,
+                'sectioncourse': sectioncourse, 'sectionclassroom': sectionclassroom, 'activity': activity
+
+            }
+
+    return render(request, 'timetableapp/lecturerPage.html', context)
 
 
 @login_required(login_url='login')
@@ -234,26 +249,30 @@ def ProfessorView(request):
         else:
             messages.success(request, 'Professor already exists or you have added wrong attributes.')
     return render(request, 'timetableapp/AddProfessor.html', context)
+
+
 @login_required(login_url='login')
 def ProfessorTable(request):
-    professor1 = Lecturer.objects.all()
-    context = {'professor1': professor1}
+    lecturer = Lecturer.objects.all()
+    context = {'lecturer': lecturer}
     return render(request, 'timetableapp/ProfessorTable.html', context)
+
+
 @login_required(login_url='login')
 def updateProfessorView(request, pk):
-    professor = Lecturer.objects.get(professor_id=pk)
+    professor = Lecturer.objects.get(lecturer_id=pk)
     form = ProfessorForm(instance=professor)
     context = {'form': form}
     if request.method == 'POST':
         form = ProfessorForm(request.POST, instance=professor)
         if form.is_valid():
             form.save()
-            return redirect('/add-professor')
+            return redirect('add-professor')
     return render(request, 'timetableapp/ViewSection.html', context)
 
 @login_required(login_url='login')
 def deleteProfessor(request, pk):
-    deleteprofessor = Lecturer.objects.get(professor_id=pk)
+    deleteprofessor = Lecturer.objects.get(lecturer_id=pk)
     context = {'delete': deleteprofessor}
     if request.method == 'POST':
         deleteprofessor.delete()
@@ -276,11 +295,15 @@ def ClassroomView(request):
         else:
             messages.error(request, 'Do not enter the same class ID')
     return render(request, 'timetableapp/AddClassroom.html', context)
+
+
 @login_required(login_url='login')
 def ClassroomTable(request):
     classrooms = Classroom.objects.all()
     context = {'classrooms': classrooms}
     return render(request, 'timetableapp/ClassroomTable.html', context)
+
+
 @login_required(login_url='login')
 def updateClassroomView(request, pk):
     classroom = Classroom.objects.get(classroom_id=pk)
@@ -292,16 +315,29 @@ def updateClassroomView(request, pk):
             form.save()
             return redirect('/classroom_view')
     return render(request, 'timetableapp/ViewSection.html', context)
+
+
 @login_required(login_url='login')
 def deleteClassroom(request, pk):
     deleteClassroom = Classroom.objects.get(classroom_id=pk)
     context = {'delete': deleteClassroom}
     if request.method == 'POST':
         deleteClassroom.delete()
-        return redirect('/classroom_view')
+        return redirect('classroom-view')
 
     return render(request, 'timetableapp/deleteClassroom.html', context)
 
+
+# @login_required(login_url='login')
+# def deleteClassroom(request, pk):
+#     deleteClassroom = get_object_or_404(Classroom, pk=pk)
+#     context = {'deleteClassroom': deleteClassroom}
+
+#     if request.method == 'POST':
+#         deleteClassroom.delete()
+#         return redirect('/classroom_view')  # Change 'classroom_list' to your actual URL name for the classroom list
+
+#     return render(request, 'timetableapp/deleteClassroom.html', context)
 
 
 @login_required(login_url='login')
@@ -318,6 +354,8 @@ def ClassView(request):
         else:
             messages.error(request, 'Do not enter the same class ID')
     return render(request, 'timetableapp/AddClass.html', context)
+
+
 @login_required(login_url='login')
 def ClassCourseView(request):
     sectioncourse = ClassCourseForm()
@@ -370,7 +408,7 @@ def deleteClass(request, pk):
         deleteSectionClassrooms(pk)
         deleteClass.delete()
 
-        return redirect('/class-view')
+        return redirect('class-view')
 
     return render(request, 'timetableapp/deleteClass.html', context)
 
@@ -389,8 +427,6 @@ def ClassTable(request):
     sections = Class.objects.all()
     context = {'sections': sections}
     return render(request, 'timetableapp/ClassTable.html', context)
-
-
 
 
 def WeekDayFormView(request):
@@ -572,24 +608,155 @@ def deleteActivities(id):
 
 
 @login_required(login_url='login')
+
 def TimeTableView(request, id):
     try:
+        # Fetching required data
         section = Class.objects.get(class_id=id)
+        print(section.activity_set.all())
         courses = Course.objects.all()
-        professors = Lecturer.objects.all()
+        lecturers = Lecturer.objects.all()
         activities = Activity.objects.filter(class_id=id)
         rooms = Classroom.objects.all()
-        time = [0] * (section.end_time - section.start_time)
-        time_slot = [''] * (section.end_time - section.start_time)
-        for x in range(0, len(time)):
-            time_slot[x] = str(section.start_time + x) + ':00 - ' + str(section.start_time + x + 1) + ':00'
-            time[x] = section.start_time + x
-        context_1 = {'section': section, 'courses': courses, 'professors':professors, 'rooms': rooms, 
-                     'activities': activities, 'time': time, 'time_slot': time_slot  }
-        return render(request, 'timetableapp/TimeTable.html', context_1)
-    except Class.DoesNotExist:
-        messages.error(request, 'Activity does not exist')
+
+        # Adjust the format based on the actual format in your database
+        time_format = '%I:%M %p'  # Use '%H:%M' if times are in 24-hour format
+        
+        try:
+            start_time = datetime.strptime(section.start_time, time_format)
+            end_time = datetime.strptime(section.end_time, time_format)
+        except ValueError:
+            messages.error(request, 'Time format error in class schedule. Please ensure times are in 12-hour format (e.g., 01:00 PM).')
+            return render(request, 'timetableapp/TimeTable.html', {
+                'section': section, 
+                'courses': courses, 
+                'lecturers': lecturers, 
+                'rooms': rooms, 
+                'activities': activities
+            })
+
+        
+        time_range = (end_time - start_time).seconds // 3600
+        time = [start_time + timedelta(hours=i) for i in range(time_range)]
+        time_slot = [f"{(start_time + timedelta(hours=i)).strftime('%I:%M %p')} - {(start_time + timedelta(hours=i + 1)).strftime('%I:%M %p')}" for i in range(time_range)]
+
+        context = {
+            'section': section, 
+            'courses': courses, 
+            'lecturers': lecturers, 
+            'rooms': rooms, 
+            'activities': activities, 
+            'time': time, 
+            'time_slot': time_slot
+        }
+        return render(request, 'timetableapp/TimeTable.html', context)
     
+    except Class.DoesNotExist:
+        messages.error(request, 'Class does not exist.')
         sections = Class.objects.all()
-        context_2 = {'sections': sections}
-        return render(request, 'timetableapp/ClassTable.html', context_2)
+        context = {'sections': sections}
+        return render(request, 'timetableapp/ClassTable.html', context)
+    
+
+
+
+# def TimeTableView(request, id):
+#     try:
+#         section = Class.objects.get(class_id=id)
+#         courses = Course.objects.all()
+#         lecturers = Lecturer.objects.all()
+#         activities = Activity.objects.filter(class_id=id)
+#         rooms = Classroom.objects.all()
+
+#         # Adjust the format based on the actual format in your database
+#         time_format = '%I:%M %p'  # Use '%H:%M' if times are in 24-hour format
+        
+#         try:
+#             start_time = datetime.strptime(section.start_time, time_format)
+#             end_time = datetime.strptime(section.end_time, time_format)
+#         except ValueError:
+#             messages.error(request, 'Time format error in class schedule')
+#             return render(request, 'timetableapp/ClassTable.html', {'sections': Class.objects.all()})
+
+       
+#         time_range = (end_time - start_time).seconds // 3600 
+#         time = [start_time + timedelta(hours=i) for i in range(time_range)]
+#         time_slot = [f"{(start_time + timedelta(hours=i)).strftime('%I:%M %p')} - {(start_time + timedelta(hours=i + 1)).strftime('%I:%M %p')}" for i in range(time_range)]
+
+#         context_1 = {
+#             'section': section, 
+#             'courses': courses, 
+#             'lecturers': lecturers, 
+#             'rooms': rooms, 
+#             'activities': activities, 
+#             'time': time, 
+#             'time_slot': time_slot
+#         }
+#         return render(request, 'timetableapp/TimeTable.html', context_1)
+    
+#     except Class.DoesNotExist:
+#         messages.error(request, 'Class does not exist')
+#         sections = Class.objects.all()
+#         context_2 = {'sections': sections}
+#         return render(request, 'timetableapp/ClassTable.html', context_2)
+    
+
+
+    
+# def TimeTableView(request, id):
+#     try:
+#         section = Class.objects.get(class_id=id)
+#         courses = Course.objects.all()
+#         professors = Lecturer.objects.all()
+#         activities = Activity.objects.filter(class_id=id)
+#         rooms = Classroom.objects.all()
+
+#         # Parse start_time and end_time using datetime
+#         start_time = datetime.strptime(section.start_time, '%I:%M %p').hour
+#         end_time = datetime.strptime(section.end_time, '%I:%M %p').hour
+
+#         time_range = end_time - start_time
+#         time = [start_time + i for i in range(time_range)]
+#         time_slot = [f"{start_time + i}:00 - {start_time + i + 1}:00" for i in range(time_range)]
+
+#         context_1 = {
+#             'section': section, 
+#             'courses': courses, 
+#             'professors': professors, 
+#             'rooms': rooms, 
+#             'activities': activities, 
+#             'time': time, 
+#             'time_slot': time_slot
+#         }
+#         return render(request, 'timetableapp/TimeTable.html', context_1)
+    
+#     except Class.DoesNotExist:
+#         messages.error(request, 'Class does not exist')
+#         sections = Class.objects.all()
+#         context_2 = {'sections': sections}
+#         return render(request, 'timetableapp/ClassTable.html', context_2)
+
+
+
+# # @login_required(login_url='login')
+# # def TimeTableView(request, id):
+    # try:
+    #     section = Class.objects.get(class_id=id)
+    #     courses = Course.objects.all()
+    #     professors = Lecturer.objects.all()
+    #     activities = Activity.objects.filter(class_id=id)
+    #     rooms = Classroom.objects.all()
+    #     time = [0] * (section.end_time - section.start_time)
+    #     time_slot = [''] * (section.end_time - section.start_time)
+    #     for x in range(0, len(time)):
+    #         time_slot[x] = str(section.start_time + x) + ':00 - ' + str(section.start_time + x + 1) + ':00'
+    #         time[x] = section.start_time + x
+    #     context_1 = {'section': section, 'courses': courses, 'professors':professors, 'rooms': rooms, 
+    #                  'activities': activities, 'time': time, 'time_slot': time_slot  }
+    #     return render(request, 'timetableapp/TimeTable.html', context_1)
+    # except Class.DoesNotExist:
+    #     messages.error(request, 'Activity does not exist')
+    
+    #     sections = Class.objects.all()
+    #     context_2 = {'sections': sections}
+    #     return render(request, 'timetableapp/ClassTable.html', context_2)
