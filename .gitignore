@@ -145,4 +145,4 @@ yarn-error.log*
 .env.production.local
 
 # vscode settings and recommendations
-# .vscode
+.vscode
