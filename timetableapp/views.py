@@ -649,105 +649,46 @@ def TimeTableView(request, id):
         return render(request, 'timetableapp/ClassTable.html', context)
     
 
+@login_required(login_url='login')
+def TimeTableView(request):
+    try:
+        class_ = Class.objects.get.all()
+        activities = Activity.objects.all()
 
-
-# def TimeTableView(request, id):
-#     try:
-#         section = Class.objects.get(class_id=id)
-#         courses = Course.objects.all()
-#         lecturers = Lecturer.objects.all()
-#         activities = Activity.objects.filter(class_id=id)
-#         rooms = Classroom.objects.all()
-
-#         # Adjust the format based on the actual format in your database
-#         time_format = '%I:%M %p'  # Use '%H:%M' if times are in 24-hour format
+        # Adjust the format based on the actual format in your database
+        time_format = '%I:%M %p'  # Use '%H:%M' if times are in 24-hour format
         
-#         try:
-#             start_time = datetime.strptime(section.start_time, time_format)
-#             end_time = datetime.strptime(section.end_time, time_format)
-#         except ValueError:
-#             messages.error(request, 'Time format error in class schedule')
-#             return render(request, 'timetableapp/ClassTable.html', {'sections': Class.objects.all()})
+        try:
+            start_time = datetime.strptime(class_.start_time, time_format)
+            end_time = datetime.strptime(class_.end_time, time_format)
+        except ValueError:
+            messages.error(request, 'Time format error in class schedule. Please ensure times are in 12-hour format (e.g., 01:00 PM).')
+            return render(request, 'timetableapp/TimeTable.html', {
+                'section': class_, 
+                'activities': activities
+            })
 
-       
-#         time_range = (end_time - start_time).seconds // 3600 
-#         time = [start_time + timedelta(hours=i) for i in range(time_range)]
-#         time_slot = [f"{(start_time + timedelta(hours=i)).strftime('%I:%M %p')} - {(start_time + timedelta(hours=i + 1)).strftime('%I:%M %p')}" for i in range(time_range)]
+        add_1_hr = lambda time: (datetime.strptime(time, '%I:%M %p') + timedelta(hours=1)).strftime('%I:%M %p')
 
-#         context_1 = {
-#             'section': section, 
-#             'courses': courses, 
-#             'lecturers': lecturers, 
-#             'rooms': rooms, 
-#             'activities': activities, 
-#             'time': time, 
-#             'time_slot': time_slot
-#         }
-#         return render(request, 'timetableapp/TimeTable.html', context_1)
+        time_choices = [
+            {
+                "start": start, 
+                "stop": add_1_hr(start), 
+                "range": f'{start} - {add_1_hr(start)}'
+            }
+            for start, _ in Activity.TIME_CHOICES[:-1]
+        ]
+
+        context = {
+            'section': class_, 
+            'activities': activities, 
+            'time_choices': time_choices
+        }
+        # return render(request, 'timetableapp/TimeTable.html', context)
+        return render(request, 'timetableapp/TimeTable_Updated.html', context)
     
-#     except Class.DoesNotExist:
-#         messages.error(request, 'Class does not exist')
-#         sections = Class.objects.all()
-#         context_2 = {'sections': sections}
-#         return render(request, 'timetableapp/ClassTable.html', context_2)
-    
-
-
-    
-# def TimeTableView(request, id):
-#     try:
-#         section = Class.objects.get(class_id=id)
-#         courses = Course.objects.all()
-#         professors = Lecturer.objects.all()
-#         activities = Activity.objects.filter(class_id=id)
-#         rooms = Classroom.objects.all()
-
-#         # Parse start_time and end_time using datetime
-#         start_time = datetime.strptime(section.start_time, '%I:%M %p').hour
-#         end_time = datetime.strptime(section.end_time, '%I:%M %p').hour
-
-#         time_range = end_time - start_time
-#         time = [start_time + i for i in range(time_range)]
-#         time_slot = [f"{start_time + i}:00 - {start_time + i + 1}:00" for i in range(time_range)]
-
-#         context_1 = {
-#             'section': section, 
-#             'courses': courses, 
-#             'professors': professors, 
-#             'rooms': rooms, 
-#             'activities': activities, 
-#             'time': time, 
-#             'time_slot': time_slot
-#         }
-#         return render(request, 'timetableapp/TimeTable.html', context_1)
-    
-#     except Class.DoesNotExist:
-#         messages.error(request, 'Class does not exist')
-#         sections = Class.objects.all()
-#         context_2 = {'sections': sections}
-#         return render(request, 'timetableapp/ClassTable.html', context_2)
-
-
-
-# # @login_required(login_url='login')
-# # def TimeTableView(request, id):
-    # try:
-    #     section = Class.objects.get(class_id=id)
-    #     courses = Course.objects.all()
-    #     professors = Lecturer.objects.all()
-    #     activities = Activity.objects.filter(class_id=id)
-    #     rooms = Classroom.objects.all()
-    #     time = [0] * (section.end_time - section.start_time)
-    #     time_slot = [''] * (section.end_time - section.start_time)
-    #     for x in range(0, len(time)):
-    #         time_slot[x] = str(section.start_time + x) + ':00 - ' + str(section.start_time + x + 1) + ':00'
-    #         time[x] = section.start_time + x
-    #     context_1 = {'section': section, 'courses': courses, 'professors':professors, 'rooms': rooms, 
-    #                  'activities': activities, 'time': time, 'time_slot': time_slot  }
-    #     return render(request, 'timetableapp/TimeTable.html', context_1)
-    # except Class.DoesNotExist:
-    #     messages.error(request, 'Activity does not exist')
-    
-    #     sections = Class.objects.all()
-    #     context_2 = {'sections': sections}
-    #     return render(request, 'timetableapp/ClassTable.html', context_2)
+    except Class.DoesNotExist:
+        messages.error(request, 'Class does not exist.')
+        sections = Class.objects.all()
+        context = {'sections': sections}
+        return render(request, 'timetableapp/ClassTable.html', context)
