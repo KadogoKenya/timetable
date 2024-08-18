@@ -25,8 +25,8 @@ SECRET_KEY = '%x6mgu)dtlafcqq-i@i7z8d3r-d*vnnq&v7e2^^+*8lr#k&+#-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*', '8000-kadogokenya-timetable-m49sj3ypwwl.ws-eu115.gitpod.io']
+CSRF_TRUSTED_ORIGINS = ['https://8000-kadogokenya-timetable-m49sj3ypwwl.ws-eu115.gitpod.io']
 
 # Application definition
 
@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'multiselectfield',
     'bootstrap4',
     'crispy_bootstrap4',
-
 ]
 
 MIDDLEWARE = [

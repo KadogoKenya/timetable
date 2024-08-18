@@ -604,52 +604,43 @@ def deleteActivities(id):
 
 
 
-
-
-
 @login_required(login_url='login')
-
 def TimeTableView(request, id):
     try:
-        # Fetching required data
-        section = Class.objects.get(class_id=id)
-        print(section.activity_set.all())
-        courses = Course.objects.all()
-        lecturers = Lecturer.objects.all()
+        class_ = Class.objects.get(class_id=id)
         activities = Activity.objects.filter(class_id=id)
-        rooms = Classroom.objects.all()
 
         # Adjust the format based on the actual format in your database
         time_format = '%I:%M %p'  # Use '%H:%M' if times are in 24-hour format
         
         try:
-            start_time = datetime.strptime(section.start_time, time_format)
-            end_time = datetime.strptime(section.end_time, time_format)
+            start_time = datetime.strptime(class_.start_time, time_format)
+            end_time = datetime.strptime(class_.end_time, time_format)
         except ValueError:
             messages.error(request, 'Time format error in class schedule. Please ensure times are in 12-hour format (e.g., 01:00 PM).')
             return render(request, 'timetableapp/TimeTable.html', {
-                'section': section, 
-                'courses': courses, 
-                'lecturers': lecturers, 
-                'rooms': rooms, 
+                'section': class_, 
                 'activities': activities
             })
 
-        
-        time_range = (end_time - start_time).seconds // 3600
-        time = [start_time + timedelta(hours=i) for i in range(time_range)]
-        time_slot = [f"{(start_time + timedelta(hours=i)).strftime('%I:%M %p')} - {(start_time + timedelta(hours=i + 1)).strftime('%I:%M %p')}" for i in range(time_range)]
+        add_1_hr = lambda time: (datetime.strptime(time, '%I:%M %p') + timedelta(hours=1)).strftime('%I:%M %p')
+
+        time_choices = [
+            {
+                "start": start, 
+                "stop": add_1_hr(start), 
+                "range": f'{start} - {add_1_hr(start)}'
+            }
+            for start, _ in Activity.TIME_CHOICES[:-1]
+        ]
 
         context = {
-            'section': section, 
-            'courses': courses, 
-            'lecturers': lecturers, 
-            'rooms': rooms, 
+            'section': class_, 
             'activities': activities, 
-            'time': time, 
-            'time_slot': time_slot
+            'time_choices': time_choices
         }
-        return render(request, 'timetableapp/TimeTable.html', context)
+        # return render(request, 'timetableapp/TimeTable.html', context)
+        return render(request, 'timetableapp/TimeTable_Updated.html', context)
     
     except Class.DoesNotExist:
         messages.error(request, 'Class does not exist.')
